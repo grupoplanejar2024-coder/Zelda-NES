@@ -28,7 +28,8 @@
       background: radial-gradient(circle at top, #181e2e 0%, var(--bg) 70%);
       color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     .launcher {
@@ -48,27 +49,7 @@
       padding: 22px;
       box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
       text-align: center;
-    }
-
-    .cover-wrap {
-      position: relative;
-      width: 100%;
-      height: 280px;
-      border-radius: 14px;
-      overflow: hidden;
-      background: #0d1018;
-      border: 1px solid var(--border);
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .cover-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
+      perspective: 1100px;
     }
 
     .btn-arrow {
@@ -96,11 +77,147 @@
       transform: scale(0.95);
     }
 
-    .btn-back-cover {
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    /* Cartucho NES Dourado 3D */
+    .cartridge-stage {
+      width: 100%;
+      padding: 14px 8px 20px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-style: preserve-3d;
+      transition: transform 0.12s ease-out;
+      cursor: pointer;
+    }
+
+    .nes-gold-cart {
+      width: 244px;
+      height: 282px;
+      position: relative;
+      background: linear-gradient(155deg, #e7c96b 0%, #cfa43c 45%, #a87e20 100%);
+      border-radius: 5px 5px 3px 3px;
+      border: 1px solid #f3dc8c;
+      clip-path: polygon(
+        0 0,
+        100% 0,
+        100% calc(100% - 14px),
+        calc(100% - 10px) calc(100% - 14px),
+        calc(100% - 10px) 100%,
+        10px 100%,
+        10px calc(100% - 14px),
+        0 calc(100% - 14px)
+      );
+      box-shadow:
+        inset 0 2px 3px rgba(255, 248, 200, 0.65),
+        inset 0 -5px 8px rgba(72, 48, 4, 0.55),
+        inset 3px 0 5px rgba(255, 245, 190, 0.35),
+        inset -4px 0 6px rgba(65, 42, 3, 0.55);
+      display: flex;
+      padding: 16px 14px 18px 14px;
+      transform: translateZ(20px);
+      filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.72));
+    }
+
+    /* Coluna esquerda com ranhuras horizontais */
+    .nes-gold-ribs {
+      width: 74px;
+      height: 100%;
+      margin-right: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px 4px;
+      background: rgba(88, 60, 8, 0.16);
+      border-radius: 3px;
+      border-right: 1px solid rgba(70, 46, 4, 0.35);
+    }
+
+    .nes-rib-line {
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(180deg, #7e560a 0%, #eed279 100%);
+      box-shadow: 0 1px 1px rgba(60, 38, 2, 0.45);
+    }
+
+    /* Área direita com etiqueta e triângulo inferior */
+    .nes-gold-right {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nes-gold-label-recess {
+      width: 100%;
+      height: 196px;
+      padding: 3px;
+      background: rgba(82, 55, 6, 0.32);
+      border-radius: 4px;
+      box-shadow:
+        inset 0 2px 4px rgba(55, 35, 2, 0.6),
+        0 1px 1px rgba(255, 245, 195, 0.45);
+      display: flex;
+    }
+
+    .nes-gold-sticker {
+      width: 100%;
+      height: 100%;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+      background: #b68d2a;
+      border: 1px solid rgba(68, 44, 4, 0.55);
+    }
+
+    .nes-gold-sticker img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /* Reflexo metálico ao passar o rato */
+    .nes-gold-sticker::after {
+      content: "";
       position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 5;
+      top: 0;
+      left: -120%;
+      width: 65%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 250, 210, 0.32),
+        transparent
+      );
+      transform: skewX(-25deg);
+      transition: left 0.6s ease;
+      pointer-events: none;
+    }
+
+    .cartridge-stage:hover .nes-gold-sticker::after {
+      left: 160%;
+    }
+
+    /* Triângulo inferior gravado no cartucho */
+    .nes-gold-triangle {
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 13px solid #6b4706;
+      filter: drop-shadow(0 1px 0 rgba(255, 242, 185, 0.55));
+      margin-bottom: 4px;
     }
 
     .badge {
@@ -197,15 +314,37 @@
       visibility: hidden !important;
       pointer-events: none !important;
     }
+
+    @media (max-width: 380px) {
+      .nes-gold-cart {
+        transform: scale(0.9) translateZ(20px);
+      }
+    }
   </style>
 </head>
 <body>
   <main class="launcher" id="launcher">
     <section class="card">
-      <div class="cover-wrap">
-        <button class="btn-arrow btn-back-cover" id="btn-back-cover" type="button" aria-label="Voltar" title="Voltar">←</button>
-        <img id="cover-img" alt="Capa de The Legend of Zelda (NES)" />
+      <div class="top-bar">
+        <button class="btn-arrow" id="btn-back-cover" type="button" aria-label="Voltar" title="Voltar">←</button>
+        <span style="font-size: 12px; color: var(--muted); font-weight: 600;">KUBO TOUCH 3D</span>
+        <span style="width: 38px;"></span>
       </div>
+
+      <div class="cartridge-stage" id="cartridge3d">
+        <div class="nes-gold-cart">
+          <div class="nes-gold-ribs" id="nes-ribs"></div>
+          <div class="nes-gold-right">
+            <div class="nes-gold-label-recess">
+              <div class="nes-gold-sticker">
+                <img id="cover-img" alt="Capa de The Legend of Zelda (NES)" />
+              </div>
+            </div>
+            <div class="nes-gold-triangle"></div>
+          </div>
+        </div>
+      </div>
+
       <span class="badge">Nintendo Entertainment System • NES</span>
       <h1>The Legend of Zelda</h1>
       <p class="subtitle">Toca em jogar para iniciar o emulador no navegador.</p>
@@ -223,10 +362,19 @@
     const ROM_FILENAME = "Legend of Zelda, The (USA) (Rev 1).nes";
     const COVER_FILENAME = "nes_thelegendofzelda_2_label_thumb.jpg";
 
+    // Cria as ranhuras horizontais do cartucho NES
+    const ribsContainer = document.getElementById("nes-ribs");
+    for (let i = 0; i < 20; i++) {
+      const rib = document.createElement("span");
+      rib.className = "nes-rib-line";
+      ribsContainer.appendChild(rib);
+    }
+
     const launcherEl = document.getElementById("launcher");
     const emulatorScreenEl = document.getElementById("emulator-screen");
     const gameContainerEl = document.getElementById("game");
     const coverImgEl = document.getElementById("cover-img");
+    const cartridgeStage = document.getElementById("cartridge3d");
     const btnStart = document.getElementById("btn-start");
     const btnExit = document.getElementById("btn-exit");
     const btnBackCover = document.getElementById("btn-back-cover");
@@ -235,7 +383,6 @@
     const coverUrl = "./" + encodeURI(COVER_FILENAME);
     coverImgEl.src = coverUrl;
 
-    // Tenta recarregar uma vez com cache-bust caso o GitHub Pages ainda esteja a atualizar
     let coverRetried = false;
     coverImgEl.addEventListener("error", () => {
       if (!coverRetried) {
@@ -245,6 +392,25 @@
         statusMsg.textContent = "Não foi possível carregar a capa. Confere se o ficheiro está na raiz do repositório.";
         statusMsg.classList.add("error");
       }
+    });
+
+    // Efeito 3D de inclinação no cartucho
+    cartridgeStage.addEventListener("mousemove", (e) => {
+      const rect = cartridgeStage.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      const rotateX = (-y / 12).toFixed(2);
+      const rotateY = (x / 12).toFixed(2);
+      cartridgeStage.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+    });
+
+    cartridgeStage.addEventListener("mouseleave", () => {
+      cartridgeStage.style.transition = "transform 0.45s ease";
+      cartridgeStage.style.transform = "rotateX(0deg) rotateY(0deg) scale(1)";
+    });
+
+    cartridgeStage.addEventListener("mouseenter", () => {
+      cartridgeStage.style.transition = "none";
     });
 
     let emulatorLoaded = false;
