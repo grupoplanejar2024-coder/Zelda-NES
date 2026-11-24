@@ -53,7 +53,7 @@
     .cover-wrap {
       position: relative;
       width: 100%;
-      max-height: 300px;
+      height: 280px;
       border-radius: 14px;
       overflow: hidden;
       background: #0d1018;
@@ -67,7 +67,6 @@
     .cover-wrap img {
       width: 100%;
       height: 100%;
-      max-height: 300px;
       object-fit: contain;
       display: block;
     }
@@ -233,7 +232,20 @@
     const btnBackCover = document.getElementById("btn-back-cover");
     const statusMsg = document.getElementById("status-msg");
 
-    coverImgEl.src = "./" + encodeURI(COVER_FILENAME);
+    const coverUrl = "./" + encodeURI(COVER_FILENAME);
+    coverImgEl.src = coverUrl;
+
+    // Tenta recarregar uma vez com cache-bust caso o GitHub Pages ainda esteja a atualizar
+    let coverRetried = false;
+    coverImgEl.addEventListener("error", () => {
+      if (!coverRetried) {
+        coverRetried = true;
+        coverImgEl.src = coverUrl + "?v=" + Date.now();
+      } else {
+        statusMsg.textContent = "Não foi possível carregar a capa. Confere se o ficheiro está na raiz do repositório.";
+        statusMsg.classList.add("error");
+      }
+    });
 
     let emulatorLoaded = false;
 
@@ -272,4 +284,83 @@
 
     async function verificarRomAcessivel(url) {
       try {
-        const res = await fetch(url, { method: "HEAD", cache: "
+        const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+        if (!res.ok) {
+          return { ok: false, motivo: `Não foi possível aceder à ROM (HTTP ${res.status}).` };
+        }
+        const len = Number(res.headers.get("content-length") || 0);
+        if (res.headers.has("content-length") && len < 1024) {
+          return { ok: false, motivo: "O ficheiro da ROM parece vazio ou corrompido (< 1 KB)." };
+        }
+        return { ok: true };
+      } catch (err) {
+        return { ok: true };
+      }
+    }
+
+    function iniciarEmulatorJS(romUrl) {
+      if (emulatorLoaded) return;
+      emulatorLoaded = true;
+
+      window.EJS_player = "#game";
+      window.EJS_core = "nes";
+      window.EJS_gameName = "The Legend of Zelda";
+      window.EJS_gameUrl = romUrl;
+      window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+      window.EJS_startOnLoaded = true;
+      window.EJS_fullscreenOnLoaded = false;
+      window.EJS_virtualGamepad = true;
+      window.EJS_backgroundImage = coverUrl;
+
+      const script = document.createElement("script");
+      script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
+      script.async = true;
+      script.onload = () => {
+        hideExitButtons();
+        setTimeout(() => {
+          focusGameCanvas();
+          hideExitButtons();
+        }, 600);
+      };
+      script.onerror = () => {
+        statusMsg.textContent = "Falha ao carregar o motor do EmulatorJS. Verifica a tua ligação.";
+        statusMsg.classList.add("error");
+      };
+      document.body.appendChild(script);
+    }
+
+    btnStart.addEventListener("click", async () => {
+      statusMsg.classList.remove("error");
+      statusMsg.textContent = "A verificar ficheiro da ROM...";
+
+      const romUrl = "./" + encodeURI(ROM_FILENAME);
+      const check = await verificarRomAcessivel(romUrl);
+
+      if (!check.ok) {
+        statusMsg.textContent = `${check.motivo} Confere o nome exato do ficheiro .nes na pasta.`;
+        statusMsg.classList.add("error");
+        return;
+      }
+
+      launcherEl.style.display = "none";
+      emulatorScreenEl.classList.add("active");
+      gameContainerEl.style.width = "100%";
+      gameContainerEl.style.height = "100%";
+
+      iniciarEmulatorJS(romUrl);
+    });
+
+    btnBackCover.addEventListener("click", () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        statusMsg.textContent = "Já estás na tela inicial do jogo.";
+      }
+    });
+
+    btnExit.addEventListener("click", () => {
+      window.location.reload();
+    });
+  </script>
+</body>
+</html>
